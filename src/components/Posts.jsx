@@ -65,12 +65,10 @@ const Posts = () => {
 
   return (
     <>
-      <section className="form_section">
+      <section className="form_section ">
         <div className="container">
-          <div className="row">
-            <div className="col-12">
+          <div className="row justify-content-center">
               <Form posts={posts} setPosts={setPosts} updateData={updateData} setUpdateData={setUpdateData} />
-            </div>
           </div>
         </div>
       </section>

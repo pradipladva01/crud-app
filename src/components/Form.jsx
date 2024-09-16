@@ -7,7 +7,8 @@ const Form = ({ posts, setPosts, updateData, setUpdateData }) => {
   const [addData, setAddData] = useState({ title: "", body: "" });
   const [editData, setEditData] = useState({ title: "", body: "" });
   const [editModal, setEditModal] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isLoadingAdd, setIsLoadingAdd] = useState(false);
+  const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
 
   useEffect(() => {
     if (updateData?.id) {
@@ -41,11 +42,11 @@ const Form = ({ posts, setPosts, updateData, setUpdateData }) => {
       return;
     }
 
-    setLoading(true);
+    setIsLoadingAdd(true);
     try {
       const res = await postData(addData);
       if (res?.status === 201) {
-        setPosts([...posts, res.data]);
+        setPosts((prevPosts) => [res.data, ...prevPosts]);
         setAddData({ title: "", body: "" });
         enqueueSnackbar("Post added successfully", { variant: "success" });
       } else {
@@ -54,12 +55,12 @@ const Form = ({ posts, setPosts, updateData, setUpdateData }) => {
     } catch (error) {
       enqueueSnackbar("Error adding post", { variant: "error" });
     } finally {
-      setLoading(false);
+      setIsLoadingAdd(false);
     }
   };
 
   const updatePostData = async () => {
-    setLoading(true);
+    setIsLoadingUpdate(true);
     try {
       const res = await updatePost(updateData?.id, editData);
       if (res?.status === 200) {
@@ -76,7 +77,7 @@ const Form = ({ posts, setPosts, updateData, setUpdateData }) => {
     } catch (error) {
       enqueueSnackbar("Error updating post", { variant: "error" });
     } finally {
-      setLoading(false);
+      setIsLoadingUpdate(false);
     }
   };
 
@@ -100,37 +101,40 @@ const Form = ({ posts, setPosts, updateData, setUpdateData }) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <div className="form_field">
-          <label htmlFor="title">Title</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            placeholder="Enter title"
-            autoComplete="off"
-            value={addData.title}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="form_field">
-          <label htmlFor="body">Body</label>
-          <input
-            type="text"
-            id="body"
-            name="body"
-            placeholder="Enter body"
-            autoComplete="off"
-            value={addData.body}
-            onChange={handleInputChange}
-          />
+      <form onSubmit={handleSubmit} className="col-lg-5 text-center">
+        <div className="form_container">
+          <div className="form_field">
+            <label htmlFor="title">Title</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              placeholder="Enter title"
+              autoComplete="off"
+              value={addData.title}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form_field">
+            <label htmlFor="body">Body</label>
+            <input
+              type="text"
+              id="body"
+              name="body"
+              placeholder="Enter body"
+              autoComplete="off"
+              value={addData.body}
+              onChange={handleInputChange}
+            />
+          </div>
         </div>
         <button type="submit" value="Add">
-        Add
-          {loading && (
+          {isLoadingAdd ? (
             <div className="spinner-border text-dark" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
+          ) : (
+            "Add"
           )}
         </button>
       </form>
@@ -170,11 +174,12 @@ const Form = ({ posts, setPosts, updateData, setUpdateData }) => {
               />
             </div>
             <button type="submit" value="Edit">
-              Update
-              {loading && (
+              {isLoadingUpdate ? (
                 <div className="spinner-border text-light" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
+              ) : (
+                "Update"
               )}
             </button>
           </form>
